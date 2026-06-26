@@ -29,6 +29,10 @@ from ui.social import show_social_page
 from ui.email import show_email_page
 from ui.reports import show_reports_page
 from ui.settings import show_settings_page
+from ui.publisher import show_publisher_page
+from ui.google_business import show_google_business_page
+from ui.scheduler import show_scheduler_page
+from ui.backup import show_backup_page
 
 # Import DB init
 from db.schema import init_db
@@ -283,6 +287,10 @@ def main():
             "📊 Rankings": "rankings",
             "📱 Social": "social",
             "📧 Email": "email",
+            "🌐 Publish": "publisher",
+            "🏪 Google Biz": "google_business",
+            "⏰ Scheduler": "scheduler",
+            "💾 Backup": "backup",
             "📈 Reports": "reports",
             "⚙️ Settings": "settings"
         }
@@ -356,6 +364,14 @@ def main():
         show_social_page()
     elif page == "email":
         show_email_page()
+    elif page == "publisher":
+        show_publisher_page()
+    elif page == "google_business":
+        show_google_business_page()
+    elif page == "scheduler":
+        show_scheduler_page()
+    elif page == "backup":
+        show_backup_page()
     elif page == "reports":
         show_reports_page()
     elif page == "settings":

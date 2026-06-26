@@ -308,6 +308,108 @@ def get_dashboard_stats(user_id):
     conn.close()
     return stats
 
+# ── WORDPRESS SITE OPERATIONS ──
+
+def save_wp_site(user_id, site_name, url, username, password_encrypted, xmlrpc_url=""):
+    """Add a new WordPress site configuration."""
+    conn = get_connection()
+    conn.execute("""
+        INSERT INTO wp_sites (user_id, site_name, url, xmlrpc_url, username, password_encrypted)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (user_id, site_name, url, xmlrpc_url, username, password_encrypted))
+    conn.commit()
+    site_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+    conn.close()
+    return site_id
+
+def get_wp_sites(user_id=None):
+    """Get WordPress sites, optionally filtered by user."""
+    conn = get_connection()
+    if user_id:
+        rows = conn.execute(
+            "SELECT * FROM wp_sites WHERE user_id = ? AND is_active = 1 ORDER BY created_at DESC",
+            (user_id,)
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM wp_sites WHERE is_active = 1 ORDER BY created_at DESC"
+        ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def get_wp_site(site_id):
+    """Get a single WordPress site by ID."""
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM wp_sites WHERE id = ?", (site_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def update_wp_site(site_id, **kwargs):
+    """Update a WordPress site configuration."""
+    conn = get_connection()
+    fields = {k: v for k, v in kwargs.items() if v is not None}
+    if fields:
+        set_clause = ", ".join(f"{k} = ?" for k in fields)
+        values = list(fields.values()) + [site_id]
+        conn.execute(f"UPDATE wp_sites SET {set_clause} WHERE id = ?", values)
+        conn.commit()
+    conn.close()
+
+def delete_wp_site(site_id):
+    """Soft-delete a WordPress site."""
+    conn = get_connection()
+    conn.execute("UPDATE wp_sites SET is_active = 0 WHERE id = ?", (site_id,))
+    conn.commit()
+    conn.close()
+
+def update_wp_site_last_sync(site_id):
+    """Update the last_sync timestamp for a WP site."""
+    conn = get_connection()
+    conn.execute("UPDATE wp_sites SET last_sync = CURRENT_TIMESTAMP WHERE id = ?", (site_id,))
+    conn.commit()
+    conn.close()
+
+# ── CONTENT PUBLISH STATUS ──
+
+def update_content_publish_status(content_id, status, url=""):
+    """Update the publish status and URL of a content piece."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE content_pieces SET status = ?, published_url = ? WHERE id = ?",
+        (status, url, content_id)
+    )
+    conn.commit()
+    conn.close()
+
+def get_single_content(content_id):
+    """Get a single content piece by ID."""
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM content_pieces WHERE id = ?", (content_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def get_unpublished_content(project_id, limit=20):
+    """Get content pieces that haven't been published yet."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT * FROM content_pieces 
+        WHERE project_id = ? AND (published_url IS NULL OR published_url = '')
+        ORDER BY created_at DESC LIMIT ?
+    """, (project_id, limit)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def get_published_content(project_id, limit=20):
+    """Get content pieces that have been published."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT * FROM content_pieces 
+        WHERE project_id = ? AND published_url IS NOT NULL AND published_url != ''
+        ORDER BY created_at DESC LIMIT ?
+    """, (project_id, limit)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
 # ── Search function ──
 
 def search_all(user_id, query):

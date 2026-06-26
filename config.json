@@ -28,8 +28,21 @@
     "social": {"enabled": true, "model": "groq/llama-3.1-8b-instant"},
     "clinic": {"enabled": true, "model": "gemini/gemini-2.0-flash"}
   },
-  "social_platforms": ["google_business", "facebook", "instagram", "telegram", "email"],
-  "social_platforms_config": {
+    "social_platforms": ["google_business", "facebook", "instagram", "telegram", "email"],
+    "wordpress": {
+        "enabled": true,
+        "default_status": "publish",
+        "batch_delay_seconds": 1,
+        "auto_publish_on_generate": false,
+        "seo_plugin": "yoast"
+    },
+    "google_business": {
+        "enabled": true,
+        "post_types": ["STANDARD", "OFFER", "EVENT", "PRODUCT"],
+        "auto_reply_reviews": false,
+        "auto_post_frequency_hours": 48
+    },
+    "social_platforms_config": {
     "facebook": {
       "description": "Facebook Page Access Token + Page ID"
     },

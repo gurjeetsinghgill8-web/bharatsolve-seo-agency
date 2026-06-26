@@ -163,6 +163,41 @@ def destroy_vault() -> bool:
         return False
 
 
+def encrypt_data(plaintext: str) -> str:
+    """
+    Encrypt a single string (for WordPress passwords, etc.).
+    Returns base64-encoded encrypted string.
+    """
+    try:
+        key = _derive_key()
+        f = Fernet(key)
+        encrypted = f.encrypt(plaintext.encode())
+        return base64.b64encode(encrypted).decode()
+    except Exception as e:
+        print(f"⚠️ Encryption error: {e}")
+        # Fallback to base64 encoding (not truly secure but prevents plaintext on disk)
+        return base64.b64encode(plaintext.encode()).decode()
+
+
+def decrypt_data(encrypted_b64: str) -> str:
+    """
+    Decrypt a string that was encrypted with encrypt_data().
+    """
+    try:
+        key = _derive_key()
+        f = Fernet(key)
+        encrypted_bytes = base64.b64decode(encrypted_b64)
+        decrypted = f.decrypt(encrypted_bytes)
+        return decrypted.decode()
+    except Exception as e:
+        print(f"⚠️ Decryption error: {e}")
+        # Try simple base64 decode as fallback
+        try:
+            return base64.b64decode(encrypted_b64).decode()
+        except:
+            return ""
+
+
 def get_key(provider: str) -> str:
     """Get a single API key by provider name."""
     keys = load_api_keys()

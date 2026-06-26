@@ -225,6 +225,23 @@ def init_db():
         )
     """)
 
+    # ── WordPress Sites ──
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS wp_sites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            site_name TEXT NOT NULL,
+            url TEXT NOT NULL,
+            xmlrpc_url TEXT DEFAULT '',
+            username TEXT NOT NULL,
+            password_encrypted TEXT NOT NULL,
+            is_active INTEGER DEFAULT 1,
+            last_sync TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+
     # ── Chat History (for Manager Agent) ──
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS chat_history (
