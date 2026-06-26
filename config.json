@@ -1,6 +1,6 @@
 {
   "app_name": "BHARATSOLVE SEO AGENCY",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "db_path": "seo_agency.db",
   "language": "Hinglish",
   "subscription": {
@@ -29,6 +29,23 @@
     "clinic": {"enabled": true, "model": "gemini/gemini-2.0-flash"}
   },
   "social_platforms": ["google_business", "facebook", "instagram", "telegram", "email"],
+  "social_platforms_config": {
+    "facebook": {
+      "description": "Facebook Page Access Token + Page ID"
+    },
+    "instagram": {
+      "description": "Instagram Business Account ID + Facebook Access Token"
+    },
+    "telegram": {
+      "description": "Telegram Bot Token + Chat ID"
+    },
+    "email": {
+      "description": "SMTP settings or SendGrid API Key"
+    },
+    "google_business": {
+      "description": "Google Business Profile Access Token"
+    }
+  },
   "monitoring": {
     "sitrep_enabled": true,
     "alert_on_error": true,

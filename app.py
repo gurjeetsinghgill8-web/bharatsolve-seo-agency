@@ -26,6 +26,7 @@ from ui.keywords import show_keywords_page
 from ui.content import show_content_page
 from ui.rankings import show_rankings_page
 from ui.social import show_social_page
+from ui.email import show_email_page
 from ui.reports import show_reports_page
 from ui.settings import show_settings_page
 
@@ -46,11 +47,35 @@ st.set_page_config(
 # ── PWA Meta Tags (for installable app) ──
 # Note: On Streamlit Cloud, /static/ is served via the app's root
 st.markdown("""
-<link rel="manifest" href="/app/static/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="BHARATSOLVE SEO">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0077b6">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" crossorigin="use-credentials" href="/app/static/manifest.json">
+<link rel="apple-touch-icon" href="/app/static/icon.svg">
+""", unsafe_allow_html=True)
+
+# ── Service Worker Registration (for offline support) ──
+st.markdown("""
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/app/static/sw.js').then(
+            function(registration) { console.log('SW registered'); },
+            function(err) { console.log('SW failed:', err); }
+        );
+    });
+}
+
+// Before install prompt handler
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    console.log('PWA install prompt available');
+});
+</script>
 """, unsafe_allow_html=True)
 
 # ── Global CSS — Sky Blue Light Theme ──
@@ -257,6 +282,7 @@ def main():
             "📝 Content": "content",
             "📊 Rankings": "rankings",
             "📱 Social": "social",
+            "📧 Email": "email",
             "📈 Reports": "reports",
             "⚙️ Settings": "settings"
         }
@@ -274,6 +300,18 @@ def main():
         <div style="background: rgba(255,255,255,0.8); border-radius: 10px; padding: 0.8rem; text-align: center; margin: 1rem 0; border: 1px solid #90e0ef;">
             <p style="color: #666; margin: 0; font-size: 0.8rem;">Current Plan</p>
             <p style="color: #0077b6; margin: 0; font-weight: bold;">{tier.title()}</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Install App button (PWA)
+        st.markdown("""
+        <div style="text-align: center; margin: 0.5rem 0;">
+            <button onclick="if(deferredPrompt) { deferredPrompt.prompt(); }" 
+                    style="background: rgba(255,255,255,0.7); border: 1px solid #90e0ef; 
+                           border-radius: 10px; padding: 0.4rem 1rem; color: #0077b6; 
+                           cursor: pointer; font-size: 0.9rem; width: 100%;">
+                📲 Install App
+            </button>
         </div>
         """, unsafe_allow_html=True)
         
@@ -316,6 +354,8 @@ def main():
         show_rankings_page()
     elif page == "social":
         show_social_page()
+    elif page == "email":
+        show_email_page()
     elif page == "reports":
         show_reports_page()
     elif page == "settings":

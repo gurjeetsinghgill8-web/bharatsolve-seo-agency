@@ -227,11 +227,22 @@ def schedule_social_post(project_id, platform, content, scheduled_for=None):
     conn.close()
     return pid
 
+def update_social_post_status(post_id, status, posted_at=None):
+    conn = get_connection()
+    if posted_at:
+        conn.execute("UPDATE social_posts SET status = ?, posted_at = ? WHERE id = ?",
+                     (status, posted_at, post_id))
+    else:
+        conn.execute("UPDATE social_posts SET status = ? WHERE id = ?",
+                     (status, post_id))
+    conn.commit()
+    conn.close()
+
 def get_scheduled_posts(project_id, limit=20):
     conn = get_connection()
     rows = conn.execute("""
         SELECT * FROM social_posts WHERE project_id = ?
-        ORDER BY scheduled_for ASC LIMIT ?
+        ORDER BY created_at DESC LIMIT ?
     """, (project_id, limit)).fetchall()
     conn.close()
     return [dict(r) for r in rows]
