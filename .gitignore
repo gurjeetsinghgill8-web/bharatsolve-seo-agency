@@ -1,0 +1,42 @@
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Environment & Secrets ──
+.env
+.vault.enc
+.vault.salt
+**/.env
+
+# ── Database ──
+*.db
+*.sqlite
+*.sqlite3
+
+# ── IDE & OS ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── Outputs ──
+pdf_outputs/
+output/
+temp/
+*.log
+
+# ── Virtual Environment ──
+venv/
+env/
+.venv/
+env.bharat/
